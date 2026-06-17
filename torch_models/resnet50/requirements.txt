@@ -1,0 +1,5 @@
+iree-turbine==3.9.0
+torch==2.12.0
+transformers==5.10.2
+datasets==4.8.5
+pillow==12.2.0

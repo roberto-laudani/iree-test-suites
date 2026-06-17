@@ -86,12 +86,22 @@ class ModuleArtifact(Artifact):
         return compstats
 
     def get_mlir_path(self) -> Path:
-        """Get the path to the MLIR file used to generate this module."""
+        """Get the path to the MLIR file used to generate this module.
+
+        The "mlir" field may be either an Azure Blob Storage URL (downloaded and
+        cached) or a local filesystem path. A relative local path is resolved
+        against the external file directory.
+        """
         module_data = json.loads(self.module_json.read_text())
-        mlir_url = module_data["mlir"]
-        assert (
-            "blob.core.windows.net" in mlir_url
-        ), "Only Azure Blob Storage is supported currently."
-        self.mlir_artifact = AzureArtifact(self.artifact_base_dir, mlir_url)
-        self.mlir_artifact.join()
-        return self.mlir_artifact.path
+        mlir_ref = module_data["mlir"]
+        if "blob.core.windows.net" in mlir_ref:
+            self.mlir_artifact = AzureArtifact(self.artifact_base_dir, mlir_ref)
+            self.mlir_artifact.join()
+            return self.mlir_artifact.path
+
+        mlir_path = Path(mlir_ref)
+        if not mlir_path.is_absolute():
+            mlir_path = self.external_file_dir / mlir_path
+        mlir_path = mlir_path.resolve()
+        assert mlir_path.exists(), f"Local MLIR file '{mlir_path}' does not exist."
+        return mlir_path
