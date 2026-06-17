@@ -1,6 +1,7 @@
 pytest
 pytest-timeout
 azure-storage-blob
+huggingface_hub
 tqdm
 tabulate
 numpy
