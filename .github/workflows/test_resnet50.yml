@@ -6,6 +6,8 @@
 
 name: Test ResNet50 (CPU)
 on:
+  push:
+    branches: [fork-ci]
   pull_request:
     paths:
       - ".github/workflows/test_resnet50.yml"
@@ -60,7 +62,7 @@ jobs:
             --capture=no \
             --test-file-directory=torch_models/resnet50 \
             --module-directory=torch_models \
-            --external-file-directory=torch_models/resnet50 \
+            --external-file-directory=torch_models \
             --artifact-directory=${{ github.workspace }}/artifacts \
             --job-summary-path=${{ github.workspace }} \
             -m cpu
