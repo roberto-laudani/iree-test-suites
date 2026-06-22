@@ -1,0 +1,36 @@
+{
+    "type": "quality",
+    "markers": [
+        "cpu",
+        "quick"
+    ],
+    "modules": [
+        "qwen3-600m/modules/qwen3-600m_cpu"
+    ],
+    "weights": [
+        {
+            "type": "huggingface",
+            "scope": "model",
+            "repo_id": "roofline/iree-regression-models",
+            "filename": "qwen3-600m/real_weights.irpa",
+            "revision": "21b2603f9f03f1ee63d4c82ab76e018ed0a52b09"
+        }
+    ],
+    "inputs": [
+        {
+            "value": "1x5xi64",
+            "file": "qwen3-600m/inference_input.0.bin"
+        }
+    ],
+    "expected_outputs": [
+        {
+            "value": "1x5x151936xf32",
+            "file": "qwen3-600m/inference_output.0.bin"
+        }
+    ],
+    "run_args": [
+        "--device=local-task",
+        "--function=main",
+        "--expected_f32_threshold=0.05"
+    ]
+}
