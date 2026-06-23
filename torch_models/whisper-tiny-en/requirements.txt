@@ -1,0 +1,7 @@
+iree-turbine==3.9.0
+torch==2.12.0
+transformers==5.10.2
+datasets==5.0.0
+# Audio decode for the reference FLAC sample. soundfile bundles libsndfile
+# (FLAC support) in its wheel, so unlike torchcodec it needs no system FFmpeg.
+soundfile==0.14.0

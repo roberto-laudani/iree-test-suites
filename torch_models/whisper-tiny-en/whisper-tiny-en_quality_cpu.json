@@ -1,0 +1,40 @@
+{
+    "type": "quality",
+    "markers": [
+        "cpu",
+        "quick"
+    ],
+    "modules": [
+        "whisper-tiny-en/modules/whisper-tiny-en_cpu"
+    ],
+    "weights": [
+        {
+            "type": "huggingface",
+            "scope": "model",
+            "repo_id": "roofline/iree-regression-models",
+            "filename": "whisper-tiny-en/real_weights.irpa",
+            "revision": "92e00be39406521bc615123f904a4953d1d34dfb"
+        }
+    ],
+    "inputs": [
+        {
+            "value": "1x80x3000xf32",
+            "file": "whisper-tiny-en/inference_input.0a.bin"
+        },
+        {
+            "value": "1x33xi64",
+            "file": "whisper-tiny-en/inference_input.0b.bin"
+        }
+    ],
+    "expected_outputs": [
+        {
+            "value": "1x33x51864xf32",
+            "file": "whisper-tiny-en/inference_output.0.bin"
+        }
+    ],
+    "run_args": [
+        "--device=local-task",
+        "--function=main",
+        "--expected_f32_threshold=0.05"
+    ]
+}
