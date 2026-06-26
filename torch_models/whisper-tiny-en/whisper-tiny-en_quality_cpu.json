@@ -19,17 +19,29 @@
     "inputs": [
         {
             "value": "1x80x3000xf32",
-            "file": "whisper-tiny-en/inference_input.0a.bin"
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "whisper-tiny-en/inference_input.0a.bin",
+                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+            }
         },
         {
             "value": "1x33xi64",
-            "file": "whisper-tiny-en/inference_input.0b.bin"
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "whisper-tiny-en/inference_input.0b.bin",
+                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+            }
         }
     ],
     "expected_outputs": [
         {
             "value": "1x33x51864xf32",
-            "file": "whisper-tiny-en/inference_output.0.bin"
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "whisper-tiny-en/inference_output.0.bin",
+                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+            }
         }
     ],
     "run_args": [

@@ -101,13 +101,20 @@ class TestBase(pytest.Item):
         {
             "url": "<url to file>",
             "file": "<local file path>",
+            "huggingface": {
+                "repo_id": "<hf repo id>",
+                "filename": "<file path within repo>",
+                "revision": "<optional revision>"
+            },
             "value": "<literal value> | <file path> | <byte string>"
         }
 
-        All fields are optional, but at least one must be present. "url" and
-        "file" are mutually exclusive sources for the data file; a relative
-        "file" path is resolved against the external file directory. The
-        resulting argument string is a concatenation of the fields:
+        All fields are optional, but at least one must be present. "url",
+        "file", and "huggingface" are mutually exclusive sources for the data
+        file; a relative "file" path is resolved against the external file
+        directory, and a "huggingface" entry is downloaded from the Hugging
+        Face Hub. The resulting argument string is a concatenation of the
+        fields:
           <value>=@<file_path>
         """
         args = self.test_data.get(json_field, [])
@@ -115,12 +122,21 @@ class TestBase(pytest.Item):
         for arg in args:
             url = arg.get("url", None)
             file = arg.get("file", None)
+            huggingface = arg.get("huggingface", None)
             value = arg.get("value", None)
             strings = []
             if value is not None:
                 strings.append(value)
             if url is not None:
                 artifact = AzureArtifact(artifact_base_dir=self.artifact_dir, url=url)
+                artifact.join()
+                strings.append(f"@{str(artifact.path.absolute())}")
+            elif huggingface is not None:
+                artifact = HuggingFaceArtifact(
+                    repo_id=huggingface["repo_id"],
+                    filename=huggingface["filename"],
+                    revision=huggingface.get("revision"),
+                )
                 artifact.join()
                 strings.append(f"@{str(artifact.path.absolute())}")
             elif file is not None:
@@ -130,7 +146,7 @@ class TestBase(pytest.Item):
                 strings.append(f"@{str(file_path.resolve())}")
             assert (
                 len(strings) > 0
-            ), f"{json_field} entry must have a 'url', 'file', or 'value'"
+            ), f"{json_field} entry must have a 'url', 'file', 'huggingface', or 'value'"
             arg_strings.append("=".join(strings))
         return arg_strings
 

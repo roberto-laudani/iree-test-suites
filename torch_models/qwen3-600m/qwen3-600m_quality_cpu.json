@@ -19,13 +19,21 @@
     "inputs": [
         {
             "value": "1x5xi64",
-            "file": "qwen3-600m/inference_input.0.bin"
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "qwen3-600m/inference_input.0.bin",
+                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+            }
         }
     ],
     "expected_outputs": [
         {
             "value": "1x5x151936xf32",
-            "file": "qwen3-600m/inference_output.0.bin"
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "qwen3-600m/inference_output.0.bin",
+                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+            }
         }
     ],
     "run_args": [
