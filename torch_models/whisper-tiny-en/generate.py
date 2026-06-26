@@ -10,6 +10,7 @@ Produces in --out-dir:
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import torch
@@ -92,7 +93,7 @@ def main():
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading model {MODEL_ID}@{MODEL_REVISION}")
+    print(f"Loading model {MODEL_ID}@{MODEL_REVISION}", file=sys.stderr)
     model = WhisperForConditionalGeneration.from_pretrained(
         MODEL_ID,
         revision=MODEL_REVISION,
@@ -102,13 +103,19 @@ def main():
     model.eval()
     processor = WhisperProcessor.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
 
-    print(f"Loading reference audio {DATASET_ID}@{DATASET_REVISION}[{SAMPLE_INDEX}]")
+    print(
+        f"Loading reference audio {DATASET_ID}@{DATASET_REVISION}[{SAMPLE_INDEX}]",
+        file=sys.stderr,
+    )
     audio, transcript = load_reference_audio()
     input_features = processor(
         audio, sampling_rate=SAMPLING_RATE, return_tensors="pt"
     ).input_features.to(torch.float32)
-    print(f"  transcript     {transcript!r}")
-    print(f"  input features {tuple(input_features.shape)} {input_features.dtype}")
+    print(f"  transcript     {transcript!r}", file=sys.stderr)
+    print(
+        f"  input features {tuple(input_features.shape)} {input_features.dtype}",
+        file=sys.stderr,
+    )
 
     # Teacher-forced decoder input: forced prefix and ground-truth transcript.
     tokenizer = processor.tokenizer
@@ -119,18 +126,22 @@ def main():
     transcript_ids = tokenizer(transcript, add_special_tokens=False).input_ids
     decoder_input_ids = torch.tensor([prefix + transcript_ids], dtype=torch.int64)
     print(
-        f"  decoder ids    {tuple(decoder_input_ids.shape)} {decoder_input_ids.dtype}"
+        f"  decoder ids    {tuple(decoder_input_ids.shape)} {decoder_input_ids.dtype}",
+        file=sys.stderr,
     )
 
-    print("Running eager reference forward")
+    print("Running eager reference forward", file=sys.stderr)
     wrapper = WhisperLogits(model)
     with torch.no_grad():
         ref_logits = wrapper(input_features, decoder_input_ids)
     ref_logits = ref_logits.to(torch.float32).contiguous()
-    print(f"  output logits  {tuple(ref_logits.shape)} {ref_logits.dtype}")
+    print(
+        f"  output logits  {tuple(ref_logits.shape)} {ref_logits.dtype}",
+        file=sys.stderr,
+    )
 
     # Dump raw reference input/output data.
-    print("Writing reference input/output .bin files")
+    print("Writing reference input/output .bin files", file=sys.stderr)
     (args.out_dir / "inference_input.0a.bin").write_bytes(
         input_features.numpy().astype("<f4").tobytes()
     )
@@ -142,13 +153,13 @@ def main():
     )
 
     # Export to MLIR with weights externalized into a separate .irpa.
-    print("Exporting to MLIR")
+    print("Exporting to MLIR", file=sys.stderr)
     aot.externalize_module_parameters(wrapper)
     export_output = aot.export(wrapper, args=(input_features, decoder_input_ids))
     export_output.save_mlir(str(args.out_dir / "model.mlir"))
     aot.save_module_parameters(str(args.out_dir / "real_weights.irpa"), wrapper)
 
-    print(f"Artifacts successfully written to {args.out_dir}")
+    print(f"Artifacts successfully written to {args.out_dir}", file=sys.stderr)
 
 
 if __name__ == "__main__":

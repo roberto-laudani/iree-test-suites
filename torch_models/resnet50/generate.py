@@ -9,6 +9,7 @@ Produces in --out-dir:
 """
 
 import argparse
+import sys
 import warnings
 from pathlib import Path
 
@@ -46,7 +47,7 @@ def main():
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading model {MODEL_ID}@{args.model_revision} (f32)")
+    print(f"Loading model {MODEL_ID}@{args.model_revision} (f32)", file=sys.stderr)
     model = AutoModelForImageClassification.from_pretrained(
         MODEL_ID, revision=args.model_revision, dtype=torch.float32
     )
@@ -54,7 +55,8 @@ def main():
 
     # Preprocess with the checkpoint's own processor to match its documented preprocessing.
     print(
-        f"Loading and preprocessing sample image from {args.dataset_id}@{args.dataset_revision}"
+        f"Loading and preprocessing sample image from {args.dataset_id}@{args.dataset_revision}",
+        file=sys.stderr,
     )
     image = load_dataset(args.dataset_id, revision=args.dataset_revision)["test"][
         "image"
@@ -69,13 +71,13 @@ def main():
     )
 
     # Capture eager logits before externalizing params so numerics match the export.
-    print("Running eager reference forward")
+    print("Running eager reference forward", file=sys.stderr)
     with torch.no_grad():
         ref_logits = model(pixel_values=pixel_values).logits
     ref_logits = ref_logits.to(torch.float32).contiguous()
 
     # Dump raw reference input/output data.
-    print("Writing reference input/output .bin files")
+    print("Writing reference input/output .bin files", file=sys.stderr)
     (args.out_dir / "inference_input.0.bin").write_bytes(
         pixel_values.numpy().astype("<f4").tobytes()
     )
@@ -84,14 +86,14 @@ def main():
     )
 
     # Export to MLIR with weights externalized into a separate .irpa.
-    print("Exporting to MLIR")
+    print("Exporting to MLIR", file=sys.stderr)
     wrapper = Classifier(model)
     aot.externalize_module_parameters(wrapper)
     export_output = aot.export(wrapper, args=(pixel_values,))
     export_output.save_mlir(str(args.out_dir / "model.mlir"))
     aot.save_module_parameters(str(args.out_dir / "real_weights.irpa"), wrapper)
 
-    print(f"Artifacts successfully written to {args.out_dir}")
+    print(f"Artifacts successfully written to {args.out_dir}", file=sys.stderr)
 
 
 if __name__ == "__main__":
