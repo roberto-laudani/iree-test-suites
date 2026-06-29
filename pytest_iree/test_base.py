@@ -4,6 +4,7 @@ from pathlib import Path
 import logging
 from pytest_iree.module import ModuleArtifact
 from pytest_iree.azure import AzureArtifact
+from pytest_iree.huggingface import HuggingFaceArtifact
 from pytest_iree.artifact import Artifact
 from pytest_iree.irpa_gen import RandomIRPAArtifact
 
@@ -73,6 +74,12 @@ class TestBase(pytest.Item):
                     artifact_base_dir=self.artifact_dir,
                     url=url,
                 )
+            elif weight["type"] == "huggingface":
+                artifact = HuggingFaceArtifact(
+                    repo_id=weight["repo_id"],
+                    filename=weight["filename"],
+                    revision=weight["revision"],
+                )
             elif weight["type"] == "random":
                 module = weight["module"]
                 seed = weight["seed"]
@@ -93,28 +100,56 @@ class TestBase(pytest.Item):
         Get argument strings based on the argument spec:
         {
             "url": "<url to file>",
+            "file": "<local file path>",
+            "huggingface": {
+                "repo_id": "<hf repo id>",
+                "filename": "<file path within repo>",
+                "revision": "<revision>"
+            },
             "value": "<literal value> | <file path> | <byte string>"
         }
 
-        All fields are optional, but at least one must be present.
-        The resulting argument string is a concatenation of the fields:
-          <value>=@<url_file_path>
+        All fields are optional, but at least one must be present. "url",
+        "file", and "huggingface" are mutually exclusive sources for the data
+        file; a relative "file" path is resolved against the external file
+        directory, and a "huggingface" entry is downloaded from the Hugging
+        Face Hub. The resulting argument string is a concatenation of the
+        fields:
+          <value>=@<file_path>
         """
         args = self.test_data.get(json_field, [])
         arg_strings: list[str] = []
         for arg in args:
             url = arg.get("url", None)
+            file = arg.get("file", None)
+            huggingface = arg.get("huggingface", None)
             value = arg.get("value", None)
             strings = []
             if value is not None:
                 strings.append(value)
+            artifact = None
             if url is not None:
                 artifact = AzureArtifact(artifact_base_dir=self.artifact_dir, url=url)
+            elif huggingface is not None:
+                artifact = HuggingFaceArtifact(
+                    repo_id=huggingface["repo_id"],
+                    filename=huggingface["filename"],
+                    revision=huggingface["revision"],
+                )
+            elif file is not None:
+                file_path = Path(file)
+                if not file_path.is_absolute():
+                    file_path = self.external_file_directory / file_path
+                strings.append(f"@{str(file_path.resolve())}")
+            if artifact is not None:
                 artifact.join()
                 strings.append(f"@{str(artifact.path.absolute())}")
             assert (
                 len(strings) > 0
-            ), f"{json_field} entry must have either 'url' or 'value'"
+            ), f"{json_field} entry must have a 'url', 'file', 'huggingface', or 'value'"
+            assert (
+                len(strings) <= 2
+            ), f"{json_field} entry must have at most one of 'url', 'file', or 'huggingface'"
             arg_strings.append("=".join(strings))
         return arg_strings
 

@@ -1,0 +1,44 @@
+{
+    "type": "quality",
+    "markers": [
+        "cpu",
+        "quick"
+    ],
+    "modules": [
+        "qwen3-600m/modules/qwen3-600m_cpu"
+    ],
+    "weights": [
+        {
+            "type": "huggingface",
+            "scope": "model",
+            "repo_id": "roofline/iree-regression-models",
+            "filename": "qwen3-600m/real_weights.irpa",
+            "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
+        }
+    ],
+    "inputs": [
+        {
+            "value": "1x5xi64",
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "qwen3-600m/inference_input.0.bin",
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
+            }
+        }
+    ],
+    "expected_outputs": [
+        {
+            "value": "1x5x151936xf32",
+            "huggingface": {
+                "repo_id": "roofline/iree-regression-models",
+                "filename": "qwen3-600m/inference_output.0.bin",
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
+            }
+        }
+    ],
+    "run_args": [
+        "--device=local-task",
+        "--function=main",
+        "--expected_f32_threshold=0.05"
+    ]
+}
