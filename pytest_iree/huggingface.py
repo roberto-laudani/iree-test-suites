@@ -13,13 +13,11 @@ class HuggingFaceArtifact(Artifact):
         self,
         repo_id: str,
         filename: str,
-        revision: str | None = None,
-        repo_type: str = "model",
+        revision: str,
     ):
         self.repo_id = repo_id
         self.filename = filename
         self.revision = revision
-        self.repo_type = repo_type
         self._path: Path | None = None
 
     @property
@@ -36,13 +34,16 @@ class HuggingFaceArtifact(Artifact):
             repo_id=self.repo_id,
             filename=self.filename,
             revision=self.revision,
-            repo_type=self.repo_type,
+            repo_type="model",
         )
         self._path = Path(local_path)
         logger.info(
             f"  Using HuggingFace artifact '{self.repo_id}/{self.filename}'"
-            f"{f'@{self.revision}' if self.revision else ''} at '{self._path}'"
+            f"@{self.revision} at '{self._path}'"
         )
 
     def __str__(self):
-        return f"hf://{self.repo_id}/{self.filename}"
+        return (
+            f"https://huggingface.co/{self.repo_id}"
+            f"/resolve/{self.revision}/{self.filename}"
+        )

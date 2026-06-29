@@ -13,7 +13,7 @@
             "scope": "model",
             "repo_id": "roofline/iree-regression-models",
             "filename": "qwen3-600m/real_weights.irpa",
-            "revision": "21b2603f9f03f1ee63d4c82ab76e018ed0a52b09"
+            "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
         }
     ],
     "inputs": [
@@ -22,7 +22,7 @@
             "huggingface": {
                 "repo_id": "roofline/iree-regression-models",
                 "filename": "qwen3-600m/inference_input.0.bin",
-                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
             }
         }
     ],
@@ -32,7 +32,7 @@
             "huggingface": {
                 "repo_id": "roofline/iree-regression-models",
                 "filename": "qwen3-600m/inference_output.0.bin",
-                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
             }
         }
     ],

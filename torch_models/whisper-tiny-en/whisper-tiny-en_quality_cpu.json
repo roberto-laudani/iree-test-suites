@@ -13,7 +13,7 @@
             "scope": "model",
             "repo_id": "roofline/iree-regression-models",
             "filename": "whisper-tiny-en/real_weights.irpa",
-            "revision": "92e00be39406521bc615123f904a4953d1d34dfb"
+            "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
         }
     ],
     "inputs": [
@@ -22,7 +22,7 @@
             "huggingface": {
                 "repo_id": "roofline/iree-regression-models",
                 "filename": "whisper-tiny-en/inference_input.0a.bin",
-                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
             }
         },
         {
@@ -30,7 +30,7 @@
             "huggingface": {
                 "repo_id": "roofline/iree-regression-models",
                 "filename": "whisper-tiny-en/inference_input.0b.bin",
-                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
             }
         }
     ],
@@ -40,7 +40,7 @@
             "huggingface": {
                 "repo_id": "roofline/iree-regression-models",
                 "filename": "whisper-tiny-en/inference_output.0.bin",
-                "revision": "59ede7e7e251f7659dedbf8e2a9e012df22e6a1a"
+                "revision": "58e284509e0adab1d387ad1931e248d114c2cd22"
             }
         }
     ],

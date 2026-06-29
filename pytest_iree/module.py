@@ -94,7 +94,10 @@ class ModuleArtifact(Artifact):
         """
         module_data = json.loads(self.module_json.read_text())
         mlir_ref = module_data["mlir"]
-        if "blob.core.windows.net" in mlir_ref:
+        if mlir_ref.startswith("https://"):
+            assert (
+                "blob.core.windows.net" in mlir_ref
+            ), f"Only Azure Blob Storage URLs are supported, got '{mlir_ref}'"
             self.mlir_artifact = AzureArtifact(self.artifact_base_dir, mlir_ref)
             self.mlir_artifact.join()
             return self.mlir_artifact.path

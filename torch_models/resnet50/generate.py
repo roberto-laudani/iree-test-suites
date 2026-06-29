@@ -10,17 +10,16 @@ Produces in --out-dir:
 
 import argparse
 import sys
-import warnings
 from pathlib import Path
 
 import torch
 
 from datasets import load_dataset
-from transformers import AutoModelForImageClassification, ConvNextImageProcessorPil
+from transformers import AutoModelForImageClassification, AutoImageProcessor
 import iree.turbine.aot as aot
 
-MODEL_ID = "microsoft/resnet-50"
-MODEL_REVISION = "34c2154c194f829b11125337b98c8f5f9965ff19"
+MODEL_ID = "timm/resnet50.a1_in1k"
+MODEL_REVISION = "767268603ca0cb0bfe326fa87277f19c419566ef"
 DATASET_ID = "huggingface/cats-image"
 DATASET_REVISION = "4613f5f1d3642cc2d56ffdf1b58c9d0f912cdc1f"
 
@@ -53,7 +52,6 @@ def main():
     )
     model.eval()
 
-    # Preprocess with the checkpoint's own processor to match its documented preprocessing.
     print(
         f"Loading and preprocessing sample image from {args.dataset_id}@{args.dataset_revision}",
         file=sys.stderr,
@@ -61,7 +59,7 @@ def main():
     image = load_dataset(args.dataset_id, revision=args.dataset_revision)["test"][
         "image"
     ][0].convert("RGB")
-    processor = ConvNextImageProcessorPil.from_pretrained(
+    processor = AutoImageProcessor.from_pretrained(
         MODEL_ID, revision=args.model_revision
     )
     pixel_values = (

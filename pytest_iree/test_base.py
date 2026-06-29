@@ -78,7 +78,7 @@ class TestBase(pytest.Item):
                 artifact = HuggingFaceArtifact(
                     repo_id=weight["repo_id"],
                     filename=weight["filename"],
-                    revision=weight.get("revision"),
+                    revision=weight["revision"],
                 )
             elif weight["type"] == "random":
                 module = weight["module"]
@@ -104,7 +104,7 @@ class TestBase(pytest.Item):
             "huggingface": {
                 "repo_id": "<hf repo id>",
                 "filename": "<file path within repo>",
-                "revision": "<optional revision>"
+                "revision": "<revision>"
             },
             "value": "<literal value> | <file path> | <byte string>"
         }
@@ -127,26 +127,29 @@ class TestBase(pytest.Item):
             strings = []
             if value is not None:
                 strings.append(value)
+            artifact = None
             if url is not None:
                 artifact = AzureArtifact(artifact_base_dir=self.artifact_dir, url=url)
-                artifact.join()
-                strings.append(f"@{str(artifact.path.absolute())}")
             elif huggingface is not None:
                 artifact = HuggingFaceArtifact(
                     repo_id=huggingface["repo_id"],
                     filename=huggingface["filename"],
-                    revision=huggingface.get("revision"),
+                    revision=huggingface["revision"],
                 )
-                artifact.join()
-                strings.append(f"@{str(artifact.path.absolute())}")
             elif file is not None:
                 file_path = Path(file)
                 if not file_path.is_absolute():
                     file_path = self.external_file_directory / file_path
                 strings.append(f"@{str(file_path.resolve())}")
+            if artifact is not None:
+                artifact.join()
+                strings.append(f"@{str(artifact.path.absolute())}")
             assert (
                 len(strings) > 0
             ), f"{json_field} entry must have a 'url', 'file', 'huggingface', or 'value'"
+            assert (
+                len(strings) <= 2
+            ), f"{json_field} entry must have at most one of 'url', 'file', or 'huggingface'"
             arg_strings.append("=".join(strings))
         return arg_strings
 

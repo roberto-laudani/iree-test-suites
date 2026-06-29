@@ -1,9 +1,9 @@
 # ResNet-50 regression test
 
 End-to-end regression for
-[`microsoft/resnet-50`](https://huggingface.co/microsoft/resnet-50). IREE compiles
-the committed MLIR, runs it on CPU, and compares the output logits against
-reference values fetched from the Hugging Face Hub.
+[`timm/resnet50.a1_in1k`](https://huggingface.co/timm/resnet50.a1_in1k). IREE
+compiles the committed MLIR, runs it on CPU, and compares the output logits
+against reference values fetched from the Hugging Face Hub.
 
 ## Files
 
