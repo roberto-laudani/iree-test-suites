@@ -1,0 +1,7 @@
+iree-turbine==3.9.0
+torch==2.14.0
+torchvision==0.29.0
+datasets==4.8.5
+pillow==12.2.0
+torchao==0.18.0
+executorch==1.4.1
